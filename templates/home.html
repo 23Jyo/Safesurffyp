@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="search-container full-page">
+    <h1>
+        <span class="search-highlight">S</span>
+        <span class="search-highlight">e</span>
+        <span class="search-highlight">a</span>
+        <span class="search-highlight">r</span>
+        <span class="search-highlight">c</span>
+        <span class="search-highlight">h</span>
+        
+    </h1>
+    <p>
+        Find What You Need, Promote What You Offer – All in One Place
+    </p>
+    <div class="search-box">
+        <form action="/search" method="post" style="display: flex; width: 100%; align-items: center;">
+            <input type="text" name="query" id="search-input" placeholder="Type here" required>
+            <button class="appsLand-btn subscribe-btn" name="submit" style="border-radius: 0 30px 30px 0;">
+                search
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

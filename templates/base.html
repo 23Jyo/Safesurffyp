@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeSurf Search</title>
+    <script defer src="script.js"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        footer {
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+            position: center;
+        }
+
+        footer p {
+            margin: 0;
+            color: #555;
+        }
+
+        footer .social-icons a {
+            margin: 0 5px;
+            color: #555;
+            font-size: 20px;
+            text-decoration: none;
+        }
+
+        footer .social-icons a:hover {
+            color: #f05050;
+        }
+
+        .search-container {
+            margin: 0 auto;
+            max-width: 600px;
+            background-color: #cfb0b0;
+        }
+
+        .search-container h1 {
+            font-size: 50px;
+            margin: 0;
+            color: #333;
+            letter-spacing: 3mm;
+        }
+
+        .search-container .search-highlight {
+            color: #f05050;
+        }
+
+        .search-container p {
+            margin: 10px 0 30px;
+            color: #555;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            overflow: hidden;
+            background-color: #fff;
+        }
+        
+        .search-box input {
+            flex-grow: 1;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            border-radius: 50px 0 0 50px;
+        }
+        
+        .search-box button {
+            background-color: #f05050;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 0 50px 50px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-box button:hover {
+            background-color: #e63939;
+        }
+
+        .full-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 68vh;
+            background-color: #f9f9f9;
+        }
+        
+        .background {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: 65px;
+        }
+
+        header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        header .logo span {
+            color: #f05050;
+        }
+
+        header nav a {
+            text-decoration: none;
+            color: #f05050;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        main {
+            padding: 50px 10px;
+            position: static;
+        }
+
+        .results-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results-container h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .results-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        .result-url {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            text-decoration: none;
+            word-break: break-word;
+        }
+        
+        .result-url:hover {
+            text-decoration: underline;
+        }
+        
+        .result-description {
+            margin: 10px 0;
+            color: #555;
+            font-size: 16px;
+        }
+        
+        .result-rating {
+            color: #f39c12;
+            font-size: 16px;
+        }
+        
+        .back-link {
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            color: #f05050;
+            font-weight: bold;
+            border: 2px solid #f05050;
+            padding: 10px 20px;
+            border-radius: 50px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .back-link:hover {
+            background-color: #f05050;
+            color: #fff;
+        }
+
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .search-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+
+        /* General Styles for Result Links */
+
+        
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Safe<span>Surf</span></div>
+        <nav>
+            <a href="/">Home</a>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; Copyright. Designed And Developed by SafeSurf</p>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-google"></i></a>
+        </div>
+    </footer>
+</body>
+</html>
