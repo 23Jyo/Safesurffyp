@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detection Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .safe {
+            color: green;
+            font-weight: bold;
+        }
+        .unsafe {
+            color: red;
+            font-weight: bold;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 15px;
+            background-color: blue;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: darkblue;
+        }
+    </style>
+</head>
+<body>
+    <h2>Phishing Detection Result</h2>
+    
+    <p><strong>URL Checked:</strong> {{ link | safe }}</p>
+
+    <p class="{% if status and 'safe' in status.lower() %}safe{% else %}unsafe{% endif %}">
+        <strong>Result:</strong> {{ status | safe }}
+    </p>
+
+    {{ button | safe }}
+
+    <br><br>
+    <a href="/" class="btn">Back to Search</a>
+</body>
+</html>

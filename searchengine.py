@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, render_template_string
 from bs4 import BeautifulSoup
 import requests
 import sqlite3
+from model_runner import run_phishing_model
 
 app = Flask(__name__)
 
@@ -96,6 +97,43 @@ def search():
 
         return render_template('results.html', query=query, results=results, images=images)
     return render_template('home.html')
+
+@app.route('/data1')
+def check_url():
+    """Check if a URL is malicious using the phishing detection model."""
+    print("🔍 /data1 route triggered!")
+    link = request.args.get('link', '')
+    print(f"🔍 /data1 route triggered with link: {link}")
+
+    if link:
+        # Remove "/url?q=" if present
+        if link.startswith("/url?q="):
+            try:
+                link = link.split("/url?q=")[1].split("&")[0]
+            except IndexError:
+                return "Invalid URL format"
+
+        # Save the link to a file
+        with open("input_url.txt", "w") as file:
+            file.write(link)
+
+        # Run the phishing detection model
+        model_output = run_phishing_model(link)
+
+        # Determine website safety
+        if model_output.strip() == "1":
+            status = "Website is safe to use."
+            button = f'<a href="{link}" target="_blank" class="btn btn-success">Continue</a>'
+        else:
+            status = "Website is unsafe to use."
+            button = f'<a href="{link}" target="_blank" class="btn btn-danger">Still want to continue?</a>'
+
+        # Render HTML directly
+         # Use an HTML template instead of inline HTML
+        return render_template('check_url.html', link=link, status=status, button=button, model_output=model_output)
+
+    return "No link provided."
+
 
 if __name__ == '__main__':
     init_db()

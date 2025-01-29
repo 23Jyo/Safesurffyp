@@ -6,7 +6,8 @@
     <ul class="results-list">
         {% for result in results %}
         <li class="result-item">
-            <a href="{{ result.url.split('/url?q=')[1].split('&')[0] if '/url?q=' in result.url else result.url }}" target="_blank" class="result-url">
+            <a href="{{ url_for('check_url', link=result.url.split('/url?q=')[1].split('&')[0] if '/url?q=' in result.url else result.url) }}" 
+               class="result-url">
                 {{ result.url.split('/url?q=')[1].split('&')[0] if '/url?q=' in result.url else result.url }}
             </a>
             
