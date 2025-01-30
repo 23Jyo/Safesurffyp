@@ -121,12 +121,13 @@ def check_url():
         model_output = run_phishing_model(link)
 
         # Determine website safety
-        if model_output.strip() == "1":
+        if int(model_output.strip()) == 1:  # Ensure it's interpreted as an integer
             status = "Website is safe to use."
             button = f'<a href="{link}" target="_blank" class="btn btn-success">Continue</a>'
         else:
             status = "Website is unsafe to use."
             button = f'<a href="{link}" target="_blank" class="btn btn-danger">Still want to continue?</a>'
+
 
         # Render HTML directly
          # Use an HTML template instead of inline HTML

@@ -25,7 +25,7 @@ if __name__ == "__main__":
         print("Error: No URL provided")
     else:
         url = sys.argv[1]
-        print(f"Checking URL: {url}")  # Debugging: Print the input URL
         prediction = check_phishing(url)
-        print(prediction)  # Ensure output is printed for subprocess
+        print(prediction)  # Make sure only this is printed
+ # Ensure output is printed for subprocess
 
