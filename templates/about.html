@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="about-header">About SafeSurf</h1>
+
+    <!-- Introduction Section -->
+    <div class="about-section">
+        <h2>Introduction</h2>
+        <p>SafeSurf is a phishing domain detection tool that helps users safely analyze websites without visiting them. The tool provides a detailed analysis of URLs to assess their trustworthiness and detect potential phishing attempts.</p>
+    </div>
+
+    <!-- Features Section -->
+    <div class="about-section">
+        <h2>Key Features</h2>
+        <ul>
+            <li>Analyze URLs for potential phishing attacks and safety risks.</li>
+            <li>View trust scores calculated from various security checks.</li>
+            <li>Preview websites without enabling external scripts for safe exploration.</li>
+            <li>Inspect metadata, WHOIS information, and SSL certificate details.</li>
+            <li>Retrieve source code of websites for detailed inspection.</li>
+        </ul>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="about-section">
+        <h2>How It Works</h2>
+        <p>SafeSurf performs comprehensive URL assessments through multiple checks:</p>
+        <ul>
+            <li><strong>Phishtank Check:</strong> Validates URLs against the Phishtank database to detect phishing links.</li>
+            <li><strong>Domain Rank:</strong> Analyzes domain popularity using the top 1 million domain list.</li>
+            <li><strong>SSL Certificate:</strong> Evaluates SSL certificate details for security verification.</li>
+            <li><strong>URL Analysis:</strong> Checks for URL length, depth, redirections, and IP presence.</li>
+            <li><strong>Content Analysis:</strong> Scans website content for potentially malicious elements like iframes, pop-ups, and login keywords.</li>
+            <li><strong>HSTS Support:</strong> Determines if the domain enforces HTTP Strict Transport Security (HSTS).</li>
+        </ul>
+    </div>
+
+    <!-- About Our Tools Section -->
+    <div class="about-section">
+        <h2>About Our Tools</h2>
+        <ul>
+            <li><strong>Controller Module:</strong> The core component that orchestrates checks and calculates trust scores.</li>
+            <li><strong>Model Module:</strong> Implements individual checks such as SSL validation, Phishtank lookup, and domain ranking.</li>
+            <li><strong>One-Time Script:</strong> Updates the list of top domains used for domain ranking checks.</li>
+        </ul>
+    </div>
+
+    <!-- How to Contribute Section -->
+    <div class="about-section">
+        <h2>Contribute to the Project</h2>
+        <p>SafeSurf is a collaborative project. We welcome contributions to improve and expand the tool. To learn more about how you can contribute, visit our <a href="README.md#learn-and-contribute-to-the-project" target="_blank">documentation</a>.</p>
+    </div>
+
+    <!-- Our Team Section -->
+    <div class="about-section">
+        <h2>Our Team</h2>
+        <ul>
+            <li><strong>Sam Mathew:</strong> Lead Developer and Security Specialist.</li>
+            <li><strong>JYS:</strong> Researcher and Contributor.</li>
+        </ul>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="about-section about-contact">
+        <h2>Contact Us</h2>
+        <p>We'd love to hear your feedback or answer any questions you may have. Reach us at:</p>
+        <ul>
+            <li>Email: <a href="mailto:support@safesurf.com">support@safesurf.com</a></li>
+            <li>Twitter: <a href="https://twitter.com/safesurf" target="_blank">@SafeSurf</a></li>
+            <li>LinkedIn: <a href="https://linkedin.com/company/safesurf" target="_blank">SafeSurf</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
