@@ -8,6 +8,13 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
+
+        body, html {
+            overflow-x: hidden; /* Prevents horizontal scrolling */
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+        }
         footer {
             padding: 20px;
             background-color: #fff;
@@ -96,7 +103,7 @@
             justify-content: center;
             align-items: center;
             height: 68vh;
-            background-color: #f9f9f9;
+            background-color: #fff;
         }
         
         .background {
@@ -134,17 +141,15 @@
         }
 
         main {
-            padding: 50px 10px;
+            padding: 40px 10px;
             position: static;
         }
 
         .results-container {
-            max-width: 800px;
+            width: 100vw;
             margin: 0 auto;
             padding: 20px;
             background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .results-container h2 {
@@ -157,8 +162,21 @@
         .results-list {
             list-style: none;
             padding: 0;
+            margin: 0;
+            width: 100%; /* Ensure it spans the full width */
+            display: flex; /* Flexbox for alignment */
+            flex-direction: column; /* Stack items vertically */
+            align-items: stretch; /* Stretch items to fit full width */
         }
         
+        .results-list li {
+            width: 100%; /* Each list item takes full width */
+            padding: 10px; /* Add some spacing */
+            border-bottom: 1px solid #ddd; /* Optional: Adds a separator */
+            background-color: #f9f9f9; /* Light background for readability */
+        }
+        
+
         .result-item {
             margin-bottom: 20px;
             padding: 15px;
