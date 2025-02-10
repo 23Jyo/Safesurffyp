@@ -58,20 +58,21 @@ def search():
     query = request.form.get('query')
     if query:
         query = query.replace(' ', '+')
-        url = f"https://www.google.com/search?q={query}&tbm=isch"  # Use Google Images search
+        url = f"https://www.google.com/search?q={query}"  # Use Google Images search
         headers = {"User-Agent": "Mozilla/5.0"}
         response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
 
         results = []
         images = []
+        unique_urls = set()
         
         # Extract text results (standard search page)
         for link in soup.select('a'):
             href = link.get('href')
             
             
-            if 'http' in href:
+            if 'http' in href and href not in unique_urls:
                 try:
                     # Fetch metadata from the linked page
                     page_response = requests.get(href, headers=headers, timeout=5)
@@ -79,9 +80,9 @@ def search():
 
                     # Extract metadata
                     tags = {
-                        'description': page_soup.find('meta', {'name': 'description'})['content'] if page_soup.find('meta', {'name': 'description'}) else '',
-                        'keywords': page_soup.find('meta', {'name': 'keywords'})['content'] if page_soup.find('meta', {'name': 'keywords'}) else '',
-                        'author': page_soup.find('meta', {'name': 'author'})['content'] if page_soup.find('meta', {'name': 'author'}) else ''
+                        'description': page_soup.find('meta', {'name': 'description'}).get('content', '') if page_soup.find('meta', {'name': 'description'}) else '',
+                        'keywords': page_soup.find('meta', {'name': 'keywords'}).get('content', '') if page_soup.find('meta', {'name': 'keywords'}) else '',
+                        'author': page_soup.find('meta', {'name': 'author'}).get('content', '') if page_soup.find('meta', {'name': 'author'}) else ''
                     }
                 except Exception as e:
                     # Fallback metadata if page fetching fails
@@ -90,6 +91,7 @@ def search():
                 # Calculate rating
                 rating = calculate_metadata_rating(tags)
                 results.append({'url': href, 'description': tags['description'], 'rating': rating})
+                unique_urls.add(href)
 
         # Extract images (Google Images search)
         for img_tag in soup.find_all('img'):
