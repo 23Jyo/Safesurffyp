@@ -58,19 +58,19 @@ def search():
     query = request.form.get('query')
     if query:
         query = query.replace(' ', '+')
-        url = f"https://www.google.com/search?q={query}"  # Use Google Images search
+        url = f"https://www.bing.com/search?q={query}"
+        image_url = f"https://www.bing.com/images/search?q={query}"# Use Google Images search
         headers = {"User-Agent": "Mozilla/5.0"}
         response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
 
         results = []
-        images = []
         unique_urls = set()
         
         # Extract text results (standard search page)
-        for link in soup.select('a'):
+        for link in soup.select('li.b_algo h2 a'):
             href = link.get('href')
-            
+            title = link.get_text(strip=True)
             
             if 'http' in href and href not in unique_urls:
                 try:
@@ -92,14 +92,18 @@ def search():
                 rating = calculate_metadata_rating(tags)
                 results.append({'url': href, 'description': tags['description'], 'rating': rating})
                 unique_urls.add(href)
+        img_response = requests.get(image_url, headers=headers)
+        img_soup = BeautifulSoup(img_response.text, 'html.parser')
+
+        images = []
+        unique_images = set()
 
         # Extract images (Google Images search)
-        for img_tag in soup.find_all('img'):
+        for img_tag in img_soup.find_all('img'):
             img_src = img_tag.get('data-src') or img_tag.get('src')
-            if img_src and not img_src.startswith('data:'):  # Ignore base64-encoded images
-                if img_src.startswith('/'):  # Convert relative URL to absolute
-                    img_src = f"https://www.google.com{img_src}"
+            if img_src and img_src.startswith("http") and img_src not in unique_images:
                 images.append(img_src)
+                unique_images.add(img_src)
 
         return render_template('results.html', query=query, results=results, images=images)
     return render_template('home.html')
