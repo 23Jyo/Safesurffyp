@@ -60,7 +60,9 @@ def search():
         query = query.replace(' ', '+')
         url = f"https://www.bing.com/search?q={query}"
         image_url = f"https://www.bing.com/images/search?q={query}"# Use Google Images search
-        headers = {"User-Agent": "Mozilla/5.0"}
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+        }
         response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -68,9 +70,8 @@ def search():
         unique_urls = set()
         
         # Extract text results (standard search page)
-        for link in soup.select('li.b_algo h2 a'):
+        for link in soup.select('li.b_algo h2 a, h2 a'):
             href = link.get('href')
-            title = link.get_text(strip=True)
             
             if 'http' in href and href not in unique_urls:
                 try:
@@ -92,6 +93,8 @@ def search():
                 rating = calculate_metadata_rating(tags)
                 results.append({'url': href, 'description': tags['description'], 'rating': rating})
                 unique_urls.add(href)
+                
+         #scrape images separately from Bing images       
         img_response = requests.get(image_url, headers=headers)
         img_soup = BeautifulSoup(img_response.text, 'html.parser')
 
