@@ -1,10 +1,12 @@
 import subprocess
+import sys
+import os
 
 def run_phishing_model(link):
     """Executes the phishing detection model and returns the result."""
-    python_exe = "C:\\ProgramData\\Anaconda3\\python.exe"  # Update this path if needed
-    script_file = "D:\\FYP\\test_phishing.py"  # Path to your model script
-
+    python_exe = "python"  # or "python3" depending on your system
+    script_file = "test_phishing.py"  # Since it's in the same folder
+    
     print(f"Running model with: {link}")  # Print the link for debugging
     print(f"Executing: {python_exe} {script_file} {link}")  # Print the command
 
@@ -13,12 +15,26 @@ def run_phishing_model(link):
             [python_exe, script_file, link],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            universal_newlines=True
+            universal_newlines=True,
+            timeout=30  # Add timeout to prevent hanging
         )
-        print(f"Model output: {result.stdout.strip()}")  # Print model output
-        print(f"Model error (if any): {result.stderr.strip()}")  # Print errors
-
-        return result.stdout.strip() or "No output from model"
+        
+        # Check for errors first
+        if result.stderr:
+            print(f"Model error: {result.stderr.strip()}")
+            return "-1"  # Return -1 to indicate error
+            
+        # Check if we have valid output
+        output = result.stdout.strip()
+        if output and output in ["0", "1"]:
+            return output
+        else:
+            print(f"Invalid model output: {output}")
+            return "-1"  # Return -1 for invalid output
+            
+    except subprocess.TimeoutExpired:
+        print("Model execution timed out")
+        return "-1"
     except Exception as e:
         print(f"Error running model: {str(e)}")
-        return f"Error running model: {str(e)}"
+        return "-1"

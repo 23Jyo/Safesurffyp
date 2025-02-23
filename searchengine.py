@@ -111,6 +111,8 @@ def search():
         return render_template('results.html', query=query, results=results, images=images)
     return render_template('home.html')
 
+# In searchengine.py, modify the check_url function:
+
 @app.route('/data1')
 def check_url():
     """Check if a URL is malicious using the phishing detection model."""
@@ -126,24 +128,24 @@ def check_url():
             except IndexError:
                 return "Invalid URL format"
 
-        # Save the link to a file
-        with open("input_url.txt", "w") as file:
-            file.write(link)
-
         # Run the phishing detection model
         model_output = run_phishing_model(link)
+        
+        # Handle the model output with better error checking
+        try:
+            # Try to convert the output to an integer
+            prediction = int(model_output.strip())
+            if prediction == 1:
+                status = "Website is safe to use."
+                button = f'<a href="{link}" target="_blank" class="btn btn-success">Continue</a>'
+            else:
+                status = "Website is unsafe to use."
+                button = f'<a href="{link}" target="_blank" class="btn btn-danger">Still want to continue?</a>'
+        except (ValueError, AttributeError):
+            # If conversion fails, treat as unsafe
+            status = "Unable to verify website safety."
+            button = f'<a href="{link}" target="_blank" class="btn btn-warning">Proceed with caution</a>'
 
-        # Determine website safety
-        if int(model_output.strip()) == 1:  # Ensure it's interpreted as an integer
-            status = "Website is safe to use."
-            button = f'<a href="{link}" target="_blank" class="btn btn-success">Continue</a>'
-        else:
-            status = "Website is unsafe to use."
-            button = f'<a href="{link}" target="_blank" class="btn btn-danger">Still want to continue?</a>'
-
-
-        # Render HTML directly
-         # Use an HTML template instead of inline HTML
         return render_template('check_url.html', link=link, status=status, button=button, model_output=model_output)
 
     return "No link provided."
