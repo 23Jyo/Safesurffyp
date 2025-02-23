@@ -3,34 +3,34 @@ import sys
 import os
 
 def run_phishing_model(link):
-    """Executes the phishing detection model and returns the result."""
-    python_exe = "python"  # or "python3" depending on your system
-    script_file = "test_phishing.py"  # Since it's in the same folder
+    """Executes the phishing detection model using the virtual environment's Python."""
+    python_exe = os.path.join(os.getcwd(), "env", "Scripts", "python.exe")  # Get venv Python path
+    script_file = "test_phishing.py"  # Ensure the script is in the same folder
     
-    print(f"Running model with: {link}")  # Print the link for debugging
-    print(f"Executing: {python_exe} {script_file} {link}")  # Print the command
+    print(f"Running model with: {link}")  # Debugging
+    print(f"Executing: {python_exe} {script_file} {link}")  # Debugging
 
     try:
         result = subprocess.run(
-            [python_exe, script_file, link],
+            [python_exe, script_file, link],  # Use venv Python
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
-            timeout=30  # Add timeout to prevent hanging
+            timeout=30  # Prevent hanging
         )
         
-        # Check for errors first
+        # Check for errors
         if result.stderr:
             print(f"Model error: {result.stderr.strip()}")
-            return "-1"  # Return -1 to indicate error
+            return "-1"  # Indicate error
             
-        # Check if we have valid output
+        # Validate output
         output = result.stdout.strip()
-        if output and output in ["0", "1"]:
+        if output in ["0", "1"]:
             return output
         else:
             print(f"Invalid model output: {output}")
-            return "-1"  # Return -1 for invalid output
+            return "-1"
             
     except subprocess.TimeoutExpired:
         print("Model execution timed out")
