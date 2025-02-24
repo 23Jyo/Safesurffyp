@@ -27,9 +27,10 @@ def run_phishing_model(link):
         # Validate output
         output = result.stdout.strip()
         if output in ["0", "1"]:
+            print("Model output = 1 (Website is safe)")
             return output
         else:
-            print(f"Invalid model output: {output}")
+            print(f" Model output: {output} (Website is unsafe)")
             return "-1"
             
     except subprocess.TimeoutExpired:
