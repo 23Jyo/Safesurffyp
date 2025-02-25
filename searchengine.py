@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import sqlite3
 from model_runner import run_phishing_model
+import re
 
 app = Flask(__name__)
 
@@ -52,11 +53,43 @@ def home():
 def about():
     return render_template('about.html')
 
+def is_valid_url(query):
+    """Check if the input is a valid URL."""
+    url_pattern = re.compile(
+        r'^(https?|ftp):\/\/'  # Protocol (http, https, ftp)
+        r'(([A-Za-z0-9-]+\.)+[A-Za-z]{2,6}'  # Domain name
+        r'localhost|'  # Localhost
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # IPv4 Address
+        r'(:\d+)?(\/[^\s]*)?$'  # Port and optional path/query parameters
+    )
+    return bool(url_pattern.match(query)) or "." in query
+
+
 @app.route('/search', methods=['POST'])
 def search():
     """Perform the search and return results."""
     query = request.form.get('query')
-    if query:
+    
+    if not query:
+        return render_template('home.html', error="Please enter a search query.")
+
+    print(f"User Input: {query}")
+    
+    if is_valid_url(query):
+        print("✅ Detected as URL, running phishing model...")  # Debugging
+        # It's a URL → Check if it's malicious
+        model_output = run_phishing_model(query)
+        if int(model_output.strip()) == 1:
+            status = "Website is safe to use."
+            button = f'<a href="{query}" target="_blank" class="btn btn-success">Continue</a>'
+        else:
+            status = "Website is unsafe to use."
+            button = f'<a href="{query}" target="_blank" class="btn btn-danger">Still want to continue?</a>'
+
+        return render_template('check_url.html', link=query, status=status, button=button, model_output=model_output)
+    else:
+        print("🔍 Detected as search query, performing web scraping...")  # Debugging
+
         query = query.replace(' ', '+')
         url = f"https://www.bing.com/search?q={query}"
         image_url = f"https://www.bing.com/images/search?q={query}"# Use Google Images search
