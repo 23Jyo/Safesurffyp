@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, render_template_string
+from flask import Flask, render_template, request, render_template_string, redirect
 from bs4 import BeautifulSoup
 import requests
 import sqlite3
@@ -77,16 +77,33 @@ def search():
     
     if is_valid_url(query):
         print("✅ Detected as URL, running phishing model...")  # Debugging
+        # Trim "/url?q=" if present in the URL
+        print(f"🔍 /data1 route triggered with link: {query}")
+        if query.startswith("/url?q="):
+            try:
+                query = query.split("/url?q=")[1].split("&")[0]
+                query = unquote(query)  # Decode URL
+            except IndexError:
+                return "Invalid URL format"
+
+        # Save the trimmed link to a file
+        with open("input_url.txt", "w") as file:
+            file.write(query)
+
         # It's a URL → Check if it's malicious
         model_output = run_phishing_model(query)
         if int(model_output.strip()) == 1:
             status = "Website is safe to use."
-            button = f'<a href="{query}" target="_blank" class="btn btn-success">Continue</a>'
+            return redirect(query)  # Redirect if safe
         else:
             status = "Website is unsafe to use."
-            button = f'<a href="{query}" target="_blank" class="btn btn-danger">Still want to continue?</a>'
-
-        return render_template('check_url.html', link=query, status=status, button=button, model_output=model_output)
+            return render_template(
+                'check_url.html', 
+                link=query, 
+                status=status, 
+                button=f'<a href="{query}" target="_blank" class="btn btn-danger">Still want to continue?</a>',
+                model_output=model_output
+            )
     else:
         print("🔍 Detected as search query, performing web scraping...")  # Debugging
 
