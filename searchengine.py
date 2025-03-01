@@ -52,66 +52,105 @@ def home():
 def about():
     return render_template('about.html')
 
+import re  # Import regex module
+
 @app.route('/search', methods=['POST'])
 def search():
-    """Perform the search and return results."""
+    """Perform the search or check a URL if it's directly entered."""
     query = request.form.get('query')
+
     if query:
-        query = query.replace(' ', '+')
-        url = f"https://www.bing.com/search?q={query}"
-        image_url = f"https://www.bing.com/images/search?q={query}"# Use Google Images search
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-        }
-        response = requests.get(url, headers=headers)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        # Check if the input is a URL
+        url_pattern = re.compile(
+            r'^(?:http|ftp)s?://'  # http:// or https://
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # Domain name
+            r'localhost|'  # Allow localhost
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # IPv4
+            r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # IPv6
+            r'(?::\d+)?'  # Optional port
+            r'(?:/?|[/?]\S+)$', re.IGNORECASE
+        )
 
-        results = []
-        unique_urls = set()
-        
-        # Extract text results (standard search page)
-        for link in soup.select('li.b_algo h2 a, h2 a'):
-            href = link.get('href')
-            
-            if 'http' in href and href not in unique_urls:
-                try:
-                    # Fetch metadata from the linked page
-                    page_response = requests.get(href, headers=headers, timeout=5)
-                    page_soup = BeautifulSoup(page_response.text, 'html.parser')
+        if re.match(url_pattern, query):  # If the input is a valid URL
+            return check_url_directly(query)  # Call phishing detection directly
+        else:
+            return process_search_query(query)  # Perform normal search
 
-                    # Extract metadata
-                    tags = {
-                        'description': page_soup.find('meta', {'name': 'description'}).get('content', '') if page_soup.find('meta', {'name': 'description'}) else '',
-                        'keywords': page_soup.find('meta', {'name': 'keywords'}).get('content', '') if page_soup.find('meta', {'name': 'keywords'}) else '',
-                        'author': page_soup.find('meta', {'name': 'author'}).get('content', '') if page_soup.find('meta', {'name': 'author'}) else ''
-                    }
-                except Exception as e:
-                    # Fallback metadata if page fetching fails
-                    tags = {'description': link.text.strip(), 'keywords': '', 'author': ''}
-
-                # Calculate rating
-                rating = calculate_metadata_rating(tags)
-                results.append({'url': href, 'description': tags['description'], 'rating': rating})
-                unique_urls.add(href)
-                
-         #scrape images separately from Bing images       
-        img_response = requests.get(image_url, headers=headers)
-        img_soup = BeautifulSoup(img_response.text, 'html.parser')
-
-        images = []
-        unique_images = set()
-
-        # Extract images (Google Images search)
-        for img_tag in img_soup.find_all('img'):
-            img_src = img_tag.get('data-src') or img_tag.get('src')
-            if img_src and img_src.startswith("http") and img_src not in unique_images:
-                images.append(img_src)
-                unique_images.add(img_src)
-
-        return render_template('results.html', query=query, results=results, images=images)
     return render_template('home.html')
 
-# In searchengine.py, modify the check_url function:
+
+def check_url_directly(url):
+    """Runs phishing detection on a direct URL input and returns results."""
+    print(f"🔍 Direct URL check triggered for: {url}")
+    
+    # Run phishing model
+    model_output = run_phishing_model(url)
+
+    try:
+        prediction = int(model_output.strip())
+        if prediction == 1:
+            status = "✅ Website is safe to use."
+            button = f'<a href="{url}" target="_blank" class="btn btn-success">Continue</a>'
+        else:
+            status = "❌ Website is unsafe to use."
+            button = f'<a href="{url}" target="_blank" class="btn btn-danger">Still want to continue?</a>'
+    except (ValueError, AttributeError):
+        status = "⚠️ Unable to verify website safety."
+        button = f'<a href="{url}" target="_blank" class="btn btn-warning">Proceed with caution</a>'
+
+    return render_template('check_url.html', link=url, status=status, button=button, model_output=model_output)
+
+
+def process_search_query(query):
+    """Handles normal search queries using web scraping."""
+    query = query.replace(' ', '+')
+    url = f"https://www.bing.com/search?q={query}"
+    image_url = f"https://www.bing.com/images/search?q={query}"
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+    }
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    results = []
+    unique_urls = set()
+    
+    for link in soup.select('li.b_algo h2 a, h2 a'):
+        href = link.get('href')
+
+        if 'http' in href and href not in unique_urls:
+            try:
+                page_response = requests.get(href, headers=headers, timeout=5)
+                page_soup = BeautifulSoup(page_response.text, 'html.parser')
+
+                tags = {
+                    'description': page_soup.find('meta', {'name': 'description'}).get('content', '') if page_soup.find('meta', {'name': 'description'}) else '',
+                    'keywords': page_soup.find('meta', {'name': 'keywords'}).get('content', '') if page_soup.find('meta', {'name': 'keywords'}) else '',
+                    'author': page_soup.find('meta', {'name': 'author'}).get('content', '') if page_soup.find('meta', {'name': 'author'}) else ''
+                }
+            except Exception as e:
+                tags = {'description': link.text.strip(), 'keywords': '', 'author': ''}
+
+            rating = calculate_metadata_rating(tags)
+            results.append({'url': href, 'description': tags['description'], 'rating': rating})
+            unique_urls.add(href)
+
+    # Scraping images separately from Bing Images       
+    img_response = requests.get(image_url, headers=headers)
+    img_soup = BeautifulSoup(img_response.text, 'html.parser')
+
+    images = []
+    unique_images = set()
+
+    for img_tag in img_soup.find_all('img'):
+        img_src = img_tag.get('data-src') or img_tag.get('src')
+        if img_src and img_src.startswith("http") and img_src not in unique_images:
+            images.append(img_src)
+            unique_images.add(img_src)
+
+    return render_template('results.html', query=query, results=results, images=images)
+
 
 @app.route('/data1')
 def check_url():
