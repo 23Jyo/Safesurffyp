@@ -31,6 +31,18 @@
         .btn:hover {
             background-color: darkblue;
         }
+        .whois-container {
+            text-align: left;
+            margin: 30px auto;
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .whois-container h3 {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -43,6 +55,20 @@
     </p>
 
     {{ button | safe }}
+
+    <div class="whois-container">
+        <h3>Details of the URL</h3>
+        {% if whois_info.error %}
+            <p>Error: {{ whois_info.error }}</p>
+        {% else %}
+            <p><strong>Domain Name:</strong> {{ whois_info.WhoisRecord.domainName }}</p>
+            <p><strong>Registrar:</strong> {{ whois_info.WhoisRecord.registrarName }}</p>
+            <p><strong>Creation Date:</strong> {{ whois_info.WhoisRecord.createdDate }}</p>
+            <p><strong>Expiration Date:</strong> {{ whois_info.WhoisRecord.expiresDate }}</p>
+            <p><strong>Updated Date:</strong> {{ whois_info.WhoisRecord.updatedDate }}</p>
+        {% endif %}
+    </div>
+
 
     <br><br>
     <a href="/" class="btn">Back to Search</a>

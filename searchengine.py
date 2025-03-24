@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, render_template_string, redirect
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 import requests
 import sqlite3
 from model_runner import run_phishing_model
@@ -161,6 +162,21 @@ def search():
         return render_template('results.html', query=query, results=results, images=images)
     return render_template('home.html')
 
+WHOIS_API_KEY = "at_hYCHEo4sX2U4ghAZHwSm9MwDAsO92"  # Replace with your actual API key
+WHOIS_API_URL = "https://www.whoisxmlapi.com/whoisserver/WhoisService"
+
+def get_whois_data(domain):
+    """Fetch WHOIS data for the given domain."""
+    params = {
+        "apiKey": WHOIS_API_KEY,
+        "domainName": domain,
+        "outputFormat": "json"
+    }
+    response = requests.get(WHOIS_API_URL, params=params)
+    if response.status_code == 200:
+        return response.json()
+    return {"error": "Failed to retrieve WHOIS data"}
+
 @app.route('/data1')
 def check_url():
     """Check if a URL is malicious using the phishing detection model."""
@@ -179,6 +195,13 @@ def check_url():
         # Save the link to a file
         with open("input_url.txt", "w") as file:
             file.write(link)
+        
+        # Extract domain name from URL
+        parsed_url = urlparse(link)
+        domain = parsed_url.netloc
+
+        # Get WHOIS data
+        whois_info = get_whois_data(domain)
 
         # Run the phishing detection model
         model_output = run_phishing_model(link)
@@ -194,7 +217,7 @@ def check_url():
 
         # Render HTML directly
          # Use an HTML template instead of inline HTML
-        return render_template('check_url.html', link=link, status=status, button=button, model_output=model_output)
+        return render_template('check_url.html', link=link, status=status, button=button, model_output=model_output, whois_info=whois_info)
 
     return "No link provided."
 
