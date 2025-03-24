@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, render_template_string, redirect
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 import requests
 import sqlite3
+import socket
 from model_runner import run_phishing_model
 import re
 
@@ -164,6 +165,8 @@ def search():
 
 WHOIS_API_KEY = "at_hYCHEo4sX2U4ghAZHwSm9MwDAsO92"  # Replace with your actual API key
 WHOIS_API_URL = "https://www.whoisxmlapi.com/whoisserver/WhoisService"
+SIMILARWEB_API_KEY = "d3b69492d88f4c3c97d2fb76d0e3a218"
+SIMILARWEB_API_URL = "https://api.similarweb.com/v1/website/{domain}/global-rank/global-rank"
 
 def get_whois_data(domain):
     """Fetch WHOIS data for the given domain."""
@@ -176,6 +179,25 @@ def get_whois_data(domain):
     if response.status_code == 200:
         return response.json()
     return {"error": "Failed to retrieve WHOIS data"}
+
+def get_domain_ip(domain):
+    """Get IP address of the domain."""
+    try:
+        return socket.gethostbyname(domain)  # Get IP using Python
+    except socket.gaierror:
+        return "Not Available"
+    
+def get_website_ranking(domain):
+    """Fetch website ranking using Similarweb API."""
+    url = SIMILARWEB_API_URL.format(domain=domain, api_key=SIMILARWEB_API_KEY)
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        print("🔍 Similarweb API Response:", data)  # Debugging
+        return data.get("rank", "Not Available")
+    else:
+        print(f"❌ Similarweb API Error: {response.status_code}, Response: {response.text}")
+        return "Not Available"
 
 @app.route('/data1')
 def check_url():
@@ -202,6 +224,12 @@ def check_url():
 
         # Get WHOIS data
         whois_info = get_whois_data(domain)
+        
+        # Get IP Address
+        ip_address = get_domain_ip(domain)
+        
+        # Get Website Ranking
+        ranking = get_website_ranking(domain)
 
         # Run the phishing detection model
         model_output = run_phishing_model(link)
@@ -217,7 +245,7 @@ def check_url():
 
         # Render HTML directly
          # Use an HTML template instead of inline HTML
-        return render_template('check_url.html', link=link, status=status, button=button, model_output=model_output, whois_info=whois_info)
+        return render_template('check_url.html', link=link, status=status, button=button, model_output=model_output, whois_info=whois_info, ip_address=ip_address, ranking=ranking)
 
     return "No link provided."
 

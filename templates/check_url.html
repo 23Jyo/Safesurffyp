@@ -66,6 +66,16 @@
             <p><strong>Creation Date:</strong> {{ whois_info.WhoisRecord.createdDate }}</p>
             <p><strong>Expiration Date:</strong> {{ whois_info.WhoisRecord.expiresDate }}</p>
             <p><strong>Updated Date:</strong> {{ whois_info.WhoisRecord.updatedDate }}</p>
+            <p><strong>IP Address:</strong> 
+                {% if whois_info.WhoisRecord.ips %}
+                    {{ whois_info.WhoisRecord.ips[0] }}
+                {% elif ip_address %}
+                    {{ ip_address }}
+                {% else %}
+                    Not Available
+                {% endif %}
+            </p>
+            <p><strong>Website Ranking:</strong> {{ ranking }}</p>
         {% endif %}
     </div>
 
