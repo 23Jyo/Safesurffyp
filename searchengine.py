@@ -71,16 +71,16 @@ def is_valid_url(query):
 def search():
     """Perform the search and return results."""
     query = request.form.get('query')
-    
+
     if not query:
         return render_template('home.html', error="Please enter a search query.")
 
     print(f"User Input: {query}")
-    
+
     if is_valid_url(query):
         print("✅ Detected as URL, running phishing model...")  # Debugging
+
         # Trim "/url?q=" if present in the URL
-        print(f"🔍 /data1 route triggered with link: {query}")
         if query.startswith("/url?q="):
             try:
                 query = query.split("/url?q=")[1].split("&")[0]
@@ -92,26 +92,34 @@ def search():
         with open("input_url.txt", "w") as file:
             file.write(query)
 
+        # Fetch WHOIS data for the domain
+        domain = query.split('/')[2]  # Extract domain from the URL
+        whois_info = get_whois_data(domain)
+
         # It's a URL → Check if it's malicious
         model_output = run_phishing_model(query)
         if int(model_output.strip()) == 1:
             status = "Website is safe to use."
-            return redirect(query)  # Redirect if safe
         else:
             status = "Website is unsafe to use."
-            return render_template(
-                'check_url.html', 
-                link=query, 
-                status=status, 
-                button=f'<a href="{query}" target="_blank" class="btn btn-danger">Still want to continue?</a>',
-                model_output=model_output
-            )
+
+        return render_template(
+            'check_url.html',
+            link=query,
+            status=status,
+            button=f'<a href="{query}" target="_blank" class="btn btn-danger">Still want to continue?</a>',
+            model_output=model_output,
+            whois_info=whois_info,  # Pass WHOIS data to template
+            ranking="Not Available",  # Placeholder for website ranking
+            ip_address=whois_info.get('WhoisRecord', {}).get('ips', [''])[0] if whois_info else "Not Available"
+        )
+
     else:
         print("🔍 Detected as search query, performing web scraping...")  # Debugging
 
         query = query.replace(' ', '+')
         url = f"https://www.bing.com/search?q={query}"
-        image_url = f"https://www.bing.com/images/search?q={query}"# Use Google Images search
+        image_url = f"https://www.bing.com/images/search?q={query}"  # Bing Image Search
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
         }
@@ -120,11 +128,11 @@ def search():
 
         results = []
         unique_urls = set()
-        
+
         # Extract text results (standard search page)
         for link in soup.select('li.b_algo h2 a, h2 a'):
             href = link.get('href')
-            
+
             if 'http' in href and href not in unique_urls:
                 try:
                     # Fetch metadata from the linked page
@@ -145,15 +153,15 @@ def search():
                 rating = calculate_metadata_rating(tags)
                 results.append({'url': href, 'description': tags['description'], 'rating': rating})
                 unique_urls.add(href)
-                
-         #scrape images separately from Bing images       
+
+        # Scrape images separately from Bing Images
         img_response = requests.get(image_url, headers=headers)
         img_soup = BeautifulSoup(img_response.text, 'html.parser')
 
         images = []
         unique_images = set()
 
-        # Extract images (Google Images search)
+        # Extract images (Bing Images)
         for img_tag in img_soup.find_all('img'):
             img_src = img_tag.get('data-src') or img_tag.get('src')
             if img_src and img_src.startswith("http") and img_src not in unique_images:
@@ -161,12 +169,10 @@ def search():
                 unique_images.add(img_src)
 
         return render_template('results.html', query=query, results=results, images=images)
+
     return render_template('home.html')
 
-WHOIS_API_KEY = "at_hYCHEo4sX2U4ghAZHwSm9MwDAsO92"  # Replace with your actual API key
-WHOIS_API_URL = "https://www.whoisxmlapi.com/whoisserver/WhoisService"
-SIMILARWEB_API_KEY = "d3b69492d88f4c3c97d2fb76d0e3a218"
-SIMILARWEB_API_URL = "https://api.similarweb.com/v1/website/{domain}/global-rank/global-rank"
+
 
 def get_whois_data(domain):
     """Fetch WHOIS data for the given domain."""
