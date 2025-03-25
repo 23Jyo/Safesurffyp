@@ -6,9 +6,16 @@ import sqlite3
 import socket
 from model_runner import run_phishing_model
 import re
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+load_dotenv()
 
+WHOIS_API_KEY = os.getenv("WHOIS_API_KEY")
+WHOIS_API_URL = os.getenv("WHOIS_API_URL")
+SIMILARWEB_API_KEY = os.getenv("SIMILARWEB_API_KEY")
+SIMILARWEB_API_URL = os.getenv("SIMILARWEB_API_URL")
 # Database setup
 def init_db():
     conn = sqlite3.connect('search.db')
