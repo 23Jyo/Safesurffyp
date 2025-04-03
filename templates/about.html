@@ -1,6 +1,107 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+    }
+
+    .about-header {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    .about-section {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .about-section h2 {
+        color: #007BFF;
+        border-bottom: 2px solid #007BFF;
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+    }
+
+    .about-section ul {
+        padding-left: 20px;
+    }
+
+    .about-contact ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .about-contact ul li {
+        margin-bottom: 8px;
+    }
+
+    .about-contact ul li a {
+        color: #007BFF;
+        text-decoration: none;
+    }
+
+    .about-contact ul li a:hover {
+        text-decoration: underline;
+    }
+
+    /* Contributors Section */
+    .contributors-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .contributor-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 250px;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .contributor-card:hover {
+        transform: scale(1.05);
+    }
+
+    .contributor-card img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+    .contributor-card h3 {
+        margin: 10px 0;
+        color: #333;
+    }
+
+    .contributor-card p {
+        margin: 5px 0;
+        color: #666;
+    }
+
+    .contributor-card a {
+        color: #007BFF;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .contributor-card a:hover {
+        text-decoration: underline;
+    }
+</style>
+
 <div class="container">
     <h1 class="about-header">About SafeSurf</h1>
 
@@ -36,29 +137,42 @@
         </ul>
     </div>
 
-    <!-- About Our Tools Section -->
+    <!-- Contributors Section -->
     <div class="about-section">
-        <h2>About Our Tools</h2>
-        <ul>
-            <li><strong>Controller Module:</strong> The core component that orchestrates checks and calculates trust scores.</li>
-            <li><strong>Model Module:</strong> Implements individual checks such as SSL validation, Phishtank lookup, and domain ranking.</li>
-            <li><strong>One-Time Script:</strong> Updates the list of top domains used for domain ranking checks.</li>
-        </ul>
-    </div>
+        <h2>Meet Our Contributors</h2>
+        <div class="contributors-container">
+            <div class="contributor-card">
+                <img src="{{ url_for('static', filename='templates\static\css\images\jyothsna.jpg') }}" alt="Jyothsna Sara Abey">
+                <h3>Jyothsna Sara Abey</h3>
+                <p>Full Stack Web Developer</p>
+                <p><strong>Expertise:</strong> Cybersecurity, Phishing Detection, Software Development</p>
+                <p>Email: <a href="mailto:jyothsnaabey2003@gmail.com.com">jyothsnaabey2003@gmail.com</a></p>
+            </div>
 
-    <!-- How to Contribute Section -->
-    <div class="about-section">
-        <h2>Contribute to the Project</h2>
-        <p>SafeSurf is a collaborative project. We welcome contributions to improve and expand the tool. To learn more about how you can contribute, visit our <a href="README.md#learn-and-contribute-to-the-project" target="_blank">documentation</a>.</p>
-    </div>
+            <div class="contributor-card">
+                <img src="https://via.placeholder.com/100" alt="JYS">
+                <h3>Neeva Mariya Eapen</h3>
+                <p>Researcher & Contributor</p>
+                <p><strong>Expertise:</strong> Data Analysis, Web Security, Threat Intelligence</p>
+                <p>Email: <a href="mailto:jys@safesurf.com">jys@safesurf.com</a></p>
+            </div>
 
-    <!-- Our Team Section -->
-    <div class="about-section">
-        <h2>Our Team</h2>
-        <ul>
-            <li><strong>Sam Mathew:</strong> Lead Developer and Security Specialist.</li>
-            <li><strong>JYS:</strong> Researcher and Contributor.</li>
-        </ul>
+            <div class="contributor-card">
+                <img src="https://via.placeholder.com/100" alt="Alex Johnson">
+                <h3>Tebin Philip George</h3>
+                <p>Software Engineer</p>
+                <p><strong>Expertise:</strong> Web Development, API Security, Machine Learning</p>
+                <p>Email: <a href="mailto:alex@safesurf.com">alex@safesurf.com</a></p>
+            </div>
+
+            <div class="contributor-card">
+                <img src="https://via.placeholder.com/100" alt="Emily White">
+                <h3>Sam Mathew</h3>
+                <p>UI/UX Designer</p>
+                <p><strong>Expertise:</strong> Web Design, User Experience, Frontend Development</p>
+                <p>Email: <a href="mailto:emily@safesurf.com">emily@safesurf.com</a></p>
+            </div>
+        </div>
     </div>
 
     <!-- Contact Section -->
@@ -72,4 +186,5 @@
         </ul>
     </div>
 </div>
+
 {% endblock %}
